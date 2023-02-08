@@ -21,13 +21,27 @@ CusWindow {
 
     MainController{
         id:controller
+    }
+    Connections{
+        target: controller
 
-        onResultCodeChanged:{
+        function onResultCodeChanged(){
+            var resultCode = controller.resultCode
             hideLoading()
             if(resultCode!==0){
+                if(resultCode === 85){
+                    showErrorToast("该设备名称已在使用中")
+                    return
+                }
                 showErrorToast("连接失败，错误码："+resultCode)
             }
         }
+
+        function onDriverListChanged(){
+            var driverList = controller.driverList
+            console.info(JSON.stringify(driverList))
+        }
+
     }
 
     page: CusPage{
@@ -68,7 +82,7 @@ CusWindow {
             PrimaryTextField{
                 id:input_remote_name
                 lableText:"文件夹："
-                text:"\\\\192.168.142.129\\123"
+                text:"\\\\192.168.142.130\\123"
                 width: 260
             }
         }
@@ -82,11 +96,27 @@ CusWindow {
             anchors{
                 horizontalCenter: parent.horizontalCenter
                 bottom:parent.bottom
-                bottomMargin: 30
+                bottomMargin: 15
             }
             onClicked: {
                 showLoading()
                 controller.onConnect(input_remote_name.text,box_local_name.getText());
+            }
+        }
+
+        PrimaryButton{
+            id:btn_refresh
+            width: 260
+            height: 36
+            text:"刷新"
+
+            anchors{
+                horizontalCenter: parent.horizontalCenter
+                bottom:parent.bottom
+                bottomMargin: 60
+            }
+            onClicked: {
+                controller.onRefresh();
             }
         }
 
